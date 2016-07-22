@@ -17,7 +17,9 @@ params = vars(params)
 data_gen_params = process_params(params)
 
 
-basedir = '~/work/Data/'
+# change basedir to the folder where data are saved. 
+# It should have same format as the provided data in data folder
+basedir = 'data/'
 filename = 'result.mat'
     
 # load body part config info, generate mask
