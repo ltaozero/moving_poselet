@@ -5,7 +5,7 @@ L. Tao and R. Vidal.
 Moving Poselets: A Discriminative and Interpretable Skeletal Motion Representation for Action Recognition.
 In ChaLearn Looking at People Workshop 2015, 2015.
 
-To run the experiments, install [Keras 1.0 version] (http://keras.io/) following their instructions [here] (http://keras.io/#installation) and run the following command:
+To run the experiments, install [Keras 1.0 version] (http://keras.io/) following the instructions [here] (http://keras.io/#installation) and run the following command:
 
 Use CPU:
 ```
