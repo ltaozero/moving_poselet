@@ -24,21 +24,16 @@ class WeightRegularizerWithPmask(Regularizer):
                             '(i.e. activity_regularizer="l2" instead '
                             'of activity_regularizer="activity_l2".')
         regularized_loss = loss
+        p = self.p
         if self.p_mask is not None:
             p = self.p * self.p_mask
         if self.l1:
-            regularized_loss += K.mean(K.abs(self.p)) * self.l1
+            regularized_loss += K.mean(K.abs(p)) * self.l1
         if self.l2:
-            regularized_loss += K.mean(K.square(self.p)) * self.l2
+            regularized_loss += K.mean(K.square(p)) * self.l2
         return K.in_train_phase(regularized_loss, loss)
 
     def get_config(self):
         return {'name': self.__class__.__name__,
                 'l1': float(self.l1),
                 'l2': float(self.l2)}
-
-
-from keras.utils.generic_utils import get_from_module
-def get(identifier, kwargs=None):
-    return get_from_module(identifier, globals(), 'regularizer',
-                           instantiate=True, kwargs=kwargs)

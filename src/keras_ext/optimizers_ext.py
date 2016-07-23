@@ -25,7 +25,7 @@ class SGD_step_decay(Optimizer):
         grads = self.get_gradients(loss, params)
         lr = self.lr * K.pow(0.5, self.iterations//self.decay_block)
         self.updates = [(self.iterations, self.iterations + 1.)]
-
+        
         # momentum
         self.weights = [K.variable(np.zeros(K.get_value(p).shape)) for p in params]
         for p, g, m in zip(params, grads, self.weights):

@@ -7,8 +7,3 @@ def multiclass_hinge(y_true, y_pred):
     y_true = 2. * y_true - 1.
     # use sum over classes instead of mean
     return K.sum(K.maximum(1. - y_true * y_pred, 0.), axis=-1)
-
-
-from keras.utils.generic_utils import get_from_module
-def get(identifier):
-    return get_from_module(identifier, globals(), 'objective')

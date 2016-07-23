@@ -8,8 +8,9 @@ from keras import backend as K
 from keras import activations, initializations, regularizers
 from keras.engine import Layer
 from keras.regularizers import ActivityRegularizer
-from keras.layers.pooling import _Pooling1D
+from keras.layers.pooling import MaxPooling1D
 from keras.layers.core import TimeDistributedDense
+#from ..regularizers_ext import WeightRegularizerWithPmask
 
 class TemporalPooling(Layer):
     '''pooling over entire temporal dimension
@@ -29,6 +30,7 @@ class TemporalPooling(Layer):
 
     def _pooling_function(self, backend, inputs):
         return NotImplementedError
+
     # add the masking part
     def call(self, x, mask=None):
         if mask:
@@ -46,7 +48,19 @@ class TemporalSumPooling(TemporalPooling):
         super(TemporalSumPooling, self).__init__(**kwargs)
 
     def _pooling_function(self,inputs):
-        return K.sum(x,axis=-2)
+        return K.sum(inputs,axis=-2)
+
+class TemporalAvgPooling(TemporalPooling):
+    '''sum pooling over entire temporal dimension
+    input: nb_sample x timesteps x input_dim
+    output: nb_sample x input_dim
+
+    '''
+    def __init__(self, **kwargs):
+        super(TemporalAvgPooling, self).__init__(**kwargs)
+
+    def _pooling_function(self,inputs):
+        return K.mean(inputs,axis=-2)
 
 class TemporalMaxPooling(TemporalPooling):
     '''max pooling over entire temporal dimension
@@ -58,7 +72,7 @@ class TemporalMaxPooling(TemporalPooling):
         super(TemporalMaxPooling, self).__init__(**kwargs)
 
     def _pooling_function(self,inputs):
-        return K.max(x,axis=-2)
+        return K.max(inputs,axis=-2)
 
 
 
@@ -77,42 +91,25 @@ class TimeDistributedDenseWithWmask(TimeDistributedDense):
                  W_regularizer=None, b_regularizer=None, activity_regularizer=None,
                  W_constraint=None, b_constraint=None,
                  bias=True, input_dim=None, input_length=None, **kwargs):
-        self.W_mask = W_mask 
+         
         super(TimeDistributedDenseWithWmask, self).__init__(output_dim,
-                 init='glorot_uniform', activation='linear', weights=None,
-                 W_regularizer=None, b_regularizer=None, activity_regularizer=None,
-                 W_constraint=None, b_constraint=None,
-                 bias=True, input_dim=None, input_length=None, **kwargs)
+                 init, activation, weights,
+                 W_regularizer, b_regularizer, activity_regularizer,
+                 W_constraint, b_constraint,
+                 bias, input_dim, input_length, **kwargs)
+        self.W_mask = W_mask
 
     def call(self, x, mask=None):
-        input_shape = self.input_spec[0].shape
-        # x has shape (samples, timesteps, input_dim)
-        input_length = input_shape[1]
-        # Note: input_length should always be provided when using tensorflow backend.
-        if not input_length:
-            if hasattr(K, 'int_shape'):
-                input_length = K.int_shape(x)[1]
-                if not input_length:
-                    raise Exception(
-                        'Layer ' + self.name +
-                        ' requires to know the length of its input, '
-                        'but it could not be inferred automatically. '
-                        'Specify it manually by passing an input_shape '
-                        'argument to the first layer in your model.')
-            else:
-                input_length = K.shape(x)[1]
-
-        # Squash samples and timesteps into a single axis
-        x = K.reshape(x, (-1, input_shape[-1]))  # (samples * timesteps, input_dim)
+        if mask:
+            x *= K.cast(K.expand_dims(mask), x.dtype)
+        x = x.dimshuffle(1,0,2)
+        W = self.W
         if self.W_mask is not None:
             W = self.W*self.W_mask
-        y = K.dot(x, W)  # (samples * timesteps, output_dim)
+        y = K.dot(x, W) 
         if self.bias:
-            y += self.b
-        # We have to reshape y to (samples, timesteps, output_dim)
-        y = K.reshape(y, (-1, input_length, self.output_dim))  # (samples, timesteps, output_dim)
-        if mask:
-            y *= K.cast(K.expand_dims(mask), y.dtype)
+            y += self.b*T.neq(x.sum(axis=2,keepdims=True),0)
+        y = self.activation(y).dimshuffle(1,0,2)
         return y
 
 
@@ -199,7 +196,7 @@ class SubSampling1D(Layer):
         return dict(list(base_config.items()) + list(config.items()))
 
 
-class MaskedMaxPooling1D(_Pooling1D):
+class MaskedMaxPooling1D(MaxPooling1D):
 
     def __init__(self, pool_length=2, stride=None,
                  border_mode='valid', **kwargs):
@@ -209,5 +206,6 @@ class MaskedMaxPooling1D(_Pooling1D):
     def compute_mask(self, x, mask=None):
         output_mask = None
         if mask is not None:
-            output_mask = mask[:,0:-self.pool_length+1:self.stride]
+            #output_mask = mask[:,0:-self.pool_length+1:self.stride]
+            output_mask = mask[:,self.pool_length-1:None:self.stride]
         return output_mask

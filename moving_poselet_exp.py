@@ -69,4 +69,4 @@ weights = model.get_weights()
         
 
 # save final data
-sio.savemat(filename,{'weights':weights, 'history':hist.history, 'predicted_labels': p_test, 'test_acc':test_acc})
+sio.savemat(filename,{'params':params, 'data_gen_params':data_gen_params,'weights':weights, 'history':hist.history, 'predicted_labels': p_test, 'test_acc':test_acc})
