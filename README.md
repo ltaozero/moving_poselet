@@ -7,7 +7,7 @@ In ChaLearn Looking at People Workshop 2015, 2015.
 
 To run the experiment, use the following command:
 
-On CPU:
+Use CPU:
 ```
 python moving_poselet_exp.py DATASET NB_MOVING_POSELET_PER_PART TEMPORAL_PYRAMID_LAYER
 ```
@@ -16,7 +16,7 @@ e.g.
 python moving_poselet_exp.py MSRDaily 50 3
 python moving_poselet_exp.py MSR3D 50 1
 ```
-On GPU
+Use GPU
 ```
 THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python moving_poselet_exp.py MSRDaily 50 3
 ```
