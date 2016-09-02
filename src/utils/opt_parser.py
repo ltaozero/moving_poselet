@@ -11,7 +11,7 @@ def mp_parser():
     parser.add_argument('--l2', action="store", type=float, dest='reg_weight', default = 1e-4)
     parser.add_argument('--opt', action="store", type=int, default = 0,dest='opt_method')
     parser.add_argument('-d', action="store", type=int,default=50, dest='decay')
-    parser.add_argument('--l1', action="store", type=float, default=0, dest='l1_weight')
+    parser.add_argument('--l1', action="store", type=float, default=0, dest='l1_alpha')
     parser.add_argument('--rs', action="store", type = int, default = 0)
     parser.add_argument('--full', action="store_true", dest='use_fb', default = False)
     parser.add_argument('-s', action="store", type=int, dest='multi_ts', default = 2)
@@ -19,6 +19,7 @@ def mp_parser():
     parser.add_argument('-b', action="store", type=int, dest='batch_size', default = 10)
     parser.add_argument('-f', action="store", dest='featurename', default = 'Feature_norm_5vecpos')
     parser.add_argument('--epoch', action="store", type=int, dest='nb_epoch', default = 300)
+    parser.add_argument('--exp', action="store", dest='exp_name',default='results')
     return parser
 
 def process_params(params):

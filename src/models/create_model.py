@@ -25,7 +25,7 @@ def get_optimizer(params):
 def create_MP_model(params,input_dims,W_mask=None):
     
     num_model = len(input_dims) 
-
+    reg_weight = params['reg_weight']
     # Create Model
     print('Start Build Model...')
     model_BP = [Sequential() for i in range(num_model)]
@@ -41,7 +41,10 @@ def create_MP_model(params,input_dims,W_mask=None):
         model.add(Merge(model_BP,mode='concat',concat_axis = -1))
     else:
         model = model_BP[0]    
-    model.add(Dense(params['nb_classes'], W_regularizer=l1l2(l1=params['l1_weight'], l2=params['reg_weight'])))
+    
+    l1_weight = params['l1_alpha']*reg_weight
+    l2_weight = (1-params['l1_alpha'])*reg_weight
+    model.add(Dense(params['nb_classes'], W_regularizer=l1l2(l1=l1_weight, l2=l2_weight)))
 
     model.compile(loss=multiclass_hinge, optimizer=get_optimizer(params),metrics=["accuracy"])
     return model

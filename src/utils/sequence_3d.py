@@ -117,7 +117,10 @@ def extract_feat(sequences, part_index,dataset,sampling_rate, window_size=5,comp
             vec = tmp[1:,:] - tmp[0:-1,:]
             norm1 = np.sqrt(np.sum(vec*vec,axis=1,keepdims=True))
             norm = norm1.ravel()
-            vec[norm>0,:] = 0.6*vec[norm>0,:] / norm1[norm>0,:]
+            vec_weight = 0.6
+            if dataset =='MSR3D':
+                vec_weight = 0.75
+            vec[norm>0,:] = vec_weight*vec[norm>0,:] / norm1[norm>0,:]
             if dataset =='MHAD' or dataset=='HDM05' or dataset=='CAD120':
                 tmp = tmp/np.sqrt(np.sum(tmp*tmp,axis=1,keepdims=True))
         if compute_vec ==1:
@@ -125,7 +128,7 @@ def extract_feat(sequences, part_index,dataset,sampling_rate, window_size=5,comp
         tmp1 = [np.array(tmp[j*sampling_rate:-(window_size-1-j)*sampling_rate or None, entry_index_all]) for j in range(window_size)]
         tmp1 = np.concatenate(np.array(tmp1),axis=1)
         # 07/08 add this line to remove 0 frames 
-        tmp1 = tmp1[tmp1.sum(axis=1)!=0,:]
+        #tmp1 = tmp1[tmp1.sum(axis=1)!=0,:]
         x.append(np.array([tmp1]))
 
     return x
