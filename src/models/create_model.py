@@ -31,7 +31,7 @@ def create_MP_model(params,input_dims,W_mask=None):
     model_BP = [Sequential() for i in range(num_model)]
            
     for i in range(num_model):
-        model_BP[i].add(Masking(mask_value=1.0,input_shape=[params['maxlen'], input_dims[i]]))
+        model_BP[i].add(Masking(mask_value=1.0,input_shape=[None, input_dims[i]]))
         model_BP[i].add(TimeDistributedDenseWithWmask(params['MP_per_model'], input_dim=input_dims[i], W_mask=W_mask, W_regularizer=WeightRegularizerWithPmask(l2=params['reg_weight'],p_mask=W_mask),init='lecun_uniform',activation='relu'))
         #model_BP[i].add(MaskedMaxPooling1D(pool_length = 100, stride =10))
         model_BP[i].add(TemporalPyramidMaxPooling(tp_layer=params['tp_layer']))

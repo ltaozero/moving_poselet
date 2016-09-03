@@ -133,7 +133,7 @@ def extract_feat(sequences, part_index,dataset,sampling_rate, window_size=5,comp
 
     return x
 
-def preprocess_data(basedir, dataset,sub, data_gen_params):
+def preprocess_data(X_train,X_test,data_gen_params):
     '''
         Generate preprocessed data for given dataset. Defalt one will extract pos+vel of 5 frames from raw skeleton feature
         Output: Feature sequences corresponding to different temporal scales
@@ -147,7 +147,6 @@ def preprocess_data(basedir, dataset,sub, data_gen_params):
     compute_vec = data_gen_params['compute_vec']
     maxlen = data_gen_params['maxlen']
 
-    X_train, y_train, X_test, y_test = load_data(basedir, dataset, features,sub=sub)
     # for cross_entropy, use 0-1 label
     #y_train = np_utils.to_categorical(Y_train, nb_classes)
     #y_test = np_utils.to_categorical(Y_test, nb_classes)
@@ -156,4 +155,4 @@ def preprocess_data(basedir, dataset,sub, data_gen_params):
     if padding:
         X_BP_train = [pad_sequences_3d(X_BP_train[i], value = 1.0,maxlen = maxlen, dtype='float32', bias=0) for i in range(len(sample_rate_set))]
         X_BP_test = [pad_sequences_3d(X_BP_test[i], value = 1.0,maxlen = maxlen, dtype='float32', bias=0) for i in range(len(sample_rate_set))]
-    return (X_BP_train, y_train, X_BP_test, y_test)
+    return (X_BP_train, X_BP_test)
