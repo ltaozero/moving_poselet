@@ -1,6 +1,7 @@
 import numpy as np
 import sys 
 import os
+import os.path
 from scipy import io as sio
 from keras.utils import np_utils
 from src.utils.seq_dataset import load_data
@@ -27,7 +28,10 @@ elif dataset =='CompAct':
 # It should have same format as the provided data in data folder
 basedir = '/home-3/ltao4@jhu.edu/work/Data/'
 filename = '/scratch/users/ltao4@jhu.edu/mp_journal/{}/{}/nword{}_lr{}_obj{}_opt{}_decay{}_l1{}_reg{}_layer{}_rs{}_multi{}.mat'.format(dataset,params['exp_name'],params['num_MP'],params['learning_rate'],'hinge', params['opt_method'],params['decay'],params['l1_alpha'],params['reg_weight'],params['tp_layer'],params['rs'],params['multi_ts'])
-    
+
+if os.path.isfile(filename):
+    sys.exit("file already exists!")
+
 # load body part config info, generate mask
 joint_map={'MSR3D':20,'MSRDaily':20,'CompAct':20,'MHAD':35,'HDM05':31,'CAD120':15}
 njoints = joint_map[dataset]
@@ -47,7 +51,7 @@ test_acc_all = []
 for sub in subset:
     print("Loading Data...")
     
-    X_train, y_train, X_test, y_test = load_data(basedir, dataset, data_gen_params['features'], params['subset'])
+    X_train, y_train, X_test, y_test = load_data(basedir, dataset, data_gen_params['features'], sub)
     nb_classes = len(np.unique(y_train))
     Y_train = np_utils.to_categorical(y_train, nb_classes)
     Y_test = np_utils.to_categorical(y_test, nb_classes)
@@ -71,7 +75,7 @@ for sub in subset:
         hist = model.fit_generator(mp_data_generator(X_train, Y_train, params['batch_size'],data_gen_params), samples_per_epoch =len(y_train), nb_epoch=params['nb_epoch'], validation_data=mp_data_generator(X_test, Y_test,params['batch_size'],data_gen_params), nb_val_samples= len(y_test),verbose=2)
 
         print("Test Model...")
-        metric = model.evaluate_generator(mp_data_generator(X_test, Y_test,params['batch_size'],data_gen_params),len(y_test))
+        metric = model.evaluate_generator(mp_data_generator(X_test, Y_test,len(y_test),data_gen_params),len(y_test))
 
     test_acc = metric[1]
     print("The accuracy on test data is: ", test_acc)

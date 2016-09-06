@@ -7,6 +7,7 @@ import scipy.io as sio
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import os
 import os.path
 import numpy as np
 import sys
@@ -14,7 +15,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 dataset = sys.argv[1]
 nword = int(sys.argv[2])
 
-layer=1
+layer=int(sys.argv[3])
 if dataset =='MSR3D':
     action_set =['high arm wave', 'horizontal arm wave', 'hammer', 'hand catch',
 'forward punch', 'high throw', 'draw x', 'draw tick', 'draw circle', 'hand clap',
@@ -32,21 +33,23 @@ elif dataset =='CompAct':
     'hand wave+drink','talk phone+drink','talk phone+pick up','talk phone+scratch head',
     'walk+calling','walk+clapping', 'walk+hand waving','walk+reading']
 
-fstr='nword{}_lr0.05_objhinge_opt0_decay50_l1{}_reg0.001_layer{}_rs0_multi2.mat'
+fstr='nword{}_lr0.05_objhinge_opt0_decay50_l1{}_reg0.001_layer{}_rs{}_multi2.mat'
 
 
-acc = np.zeros(11)
+acc_all = np.zeros(11)
+acc = np.zeros((11,10))
 for l1 in range(11):
-    fname=fstr.format(nword,0.1*l1,layer)
-    if os.path.isfile(fname):
-        a=sio.loadmat(fname)
-        
-        cv_acc=[]
-        for idx in range(len(a['hist_all'][0])):
-            cv_acc += [a['hist_all'][0][idx][0][0][2][-1][-1]]
-        acc[l1] = np.mean(cv_acc)  
-acc = acc[acc>0]
-        
-plt.plot(acc)
-plt.title('{}_nword{}'.format(dataset,nword))
-plt.savefig('plots/accurary_{}_nword{}.png'.format(dataset,nword))        
+    for rs in range(10):
+        fname=fstr.format(nword,0.1*l1,layer,rs)
+        print fname
+        if os.path.isfile(fname):
+            a=sio.loadmat(fname)
+                
+            acc[l1,rs] = np.mean(a['test_acc_all'])
+    acc_all[l1] = np.mean(acc[l1][acc[l1]>0])        
+
+print acc
+plt.plot(acc_all)
+plt.title('{}_accurary_for_different_l1_nword{}_layer{}'.format(dataset,nword,layer))
+#os.mkdir('/home-3/ltao4@jhu.edu/scratch/mp_journal/plots/{}'.format(dataset))
+plt.savefig('/home-3/ltao4@jhu.edu/scratch/mp_journal/plots/{}/accurary_for_different_l1_nword{}_layer{}.png'.format(dataset,nword,layer))        

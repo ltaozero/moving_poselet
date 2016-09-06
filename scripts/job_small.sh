@@ -3,9 +3,9 @@
 #SBATCH
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
-#SBATCH -t 24:00:00
+#SBATCH -t 1:00:00
 #SBATCh --nodes=1
-#SBATCH --mem=8g
+#SBATCH --mem=4g
 
 cd ~/Code/moving_poselet
 mkdir -p ~/logfiles/mp_journal/$1/$4
