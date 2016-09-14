@@ -36,13 +36,13 @@ if os.path.isfile(filename):
 joint_map={'MSR3D':20,'MSRDaily':20,'CompAct':20,'MHAD':35,'HDM05':31,'CAD120':15}
 njoints = joint_map[dataset]
 input_dim = 3*njoints*data_gen_params['window_size']*(data_gen_params['compute_vec']+1)
-input_dims = [input_dim] 
+input_dims = input_dim*np.ones(len(data_gen_params['sample_rate_set'])) 
 full_BP = np.arange(njoints)+1
 W_mask = create_BP_mask(dataset, params['num_MP'], input_dim) 
 MP_per_model = W_mask.shape[-1]
 if params['use_fb']:
     W_mask = None
-    MP_per_model = num_MP
+    MP_per_model = params['num_MP']
 
 data_generation = True
 weights_all=[]
@@ -75,7 +75,7 @@ for sub in subset:
         hist = model.fit_generator(mp_data_generator(X_train, Y_train, params['batch_size'],data_gen_params), samples_per_epoch =len(y_train), nb_epoch=params['nb_epoch'], validation_data=mp_data_generator(X_test, Y_test,params['batch_size'],data_gen_params), nb_val_samples= len(y_test),verbose=2)
 
         print("Test Model...")
-        metric = model.evaluate_generator(mp_data_generator(X_test, Y_test,len(y_test),data_gen_params),len(y_test))
+        metric = model.evaluate_generator(mp_data_generator(X_test, Y_test,params['batch_size'],data_gen_params),len(y_test))
 
     test_acc = metric[1]
     print("The accuracy on test data is: ", test_acc)

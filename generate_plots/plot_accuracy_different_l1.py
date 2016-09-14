@@ -49,7 +49,17 @@ for l1 in range(11):
     acc_all[l1] = np.mean(acc[l1][acc[l1]>0])        
 
 print acc
-plt.plot(acc_all)
-plt.title('{}_accurary_for_different_l1_nword{}_layer{}'.format(dataset,nword,layer))
+
+plt.xlabel('alpha')
+label = [str(0.1*i) for i in range(11)]
+plt.xticks(np.arange(11),label)
+plt.ylabel('accuracy')
+#plt.boxplot(acc.transpose())
+plt.plot(acc_all,marker='D')
+
+ax = plt.gca()
+ax.set_ylim([0.85,1])
+plt.title(dataset,fontsize=18)
+#plt.title('{}:accurary_for_different_l1_nword{}_layer{}'.format(dataset,nword,layer),fontsize=18)
 #os.mkdir('/home-3/ltao4@jhu.edu/scratch/mp_journal/plots/{}'.format(dataset))
 plt.savefig('/home-3/ltao4@jhu.edu/scratch/mp_journal/plots/{}/accurary_for_different_l1_nword{}_layer{}.png'.format(dataset,nword,layer))        

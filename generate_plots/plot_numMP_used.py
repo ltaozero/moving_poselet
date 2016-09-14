@@ -34,9 +34,10 @@ elif dataset =='CompAct':
 
 fstr='nword{}_lr0.05_objhinge_opt0_decay50_l1{}_reg0.001_layer{}_rs0_multi2.mat'
 
-fig, axes = plt.subplots(3,4,figsize=(40,20))
-for l1 in range(11):
-    ax = axes[l1//4][l1%4]
+fig, axes = plt.subplots(1,4,figsize=(50,10))
+#fig.tight_layout()
+for idx,l1 in enumerate([0,4,8,10]):#range(11):
+    ax = axes[idx%4]
     fname=fstr.format(nword,0.1*l1,layer)
     if os.path.isfile(fname):
         a=sio.loadmat(fname)
@@ -53,17 +54,18 @@ for l1 in range(11):
         cax = divider.append_axes("right", size="5%", pad=0.1)
         cbar = fig.colorbar(im, cax=cax)
         ax.set_aspect('auto')
-        ax.set_title('alpha ={}'.format(0.1*l1))
+        ax.set_title('alpha ={}'.format(0.1*l1),fontsize=24)
+        fig.subplots_adjust(wspace = .35)
 
         tickpos = np.arange(10)
         ticklabel = ['B','LL','RL','LB','LA','RA','UB','T','FUB','FB']
         ax.set_xticks(tickpos)
-        ax.set_xticklabels(ticklabel)
+        ax.set_xticklabels(ticklabel,fontsize=18)
         ax.set_yticks(np.arange(len(action_set)))
-        ax.set_yticklabels(action_set)
+        ax.set_yticklabels(action_set,fontsize=18)
         
-fig.suptitle('{}_nword{}'.format(dataset,nword))
-fig.savefig('plots/numMP_used_{}_nword{}.png'.format(dataset,nword, action_set[action]))        
+fig.suptitle('{}:MP_per_body_part={}'.format(dataset,nword),fontsize=24)
+fig.savefig('/home-3/ltao4@jhu.edu/scratch/mp_journal/plots/{}/numMP_used_nword{}_layer{}.png'.format(dataset,nword, layer))        
 
 
 

@@ -8,7 +8,7 @@ for num_words in [5,20,40,60,80,100]:
     for layer in layer_set:
         for multi_ts in [1]:
             for l2 in [ 1e-3]:
-                for l1 in [0,5]:
+                for l1 in [0]:
                     for rs in range(10):
                         sbatch_command="sbatch -o ~/logfiles/slurm-%j.out /home-3/ltao4@jhu.edu/Code/moving_poselet/scripts/{}.sh {} {} {} {} {} {} {} {}".format(sys.argv[1],sys.argv[2],num_words,layer,sys.argv[3],multi_ts,l2,0.1*l1,rs)
                         print(sbatch_command)

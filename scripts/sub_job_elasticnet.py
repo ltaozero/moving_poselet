@@ -2,7 +2,7 @@ import subprocess
 import sys
 
 layer_set = [3]
-if sys.argv[2] == 'MSR3D' or sys.argv[2]=='CompAct':
+if sys.argv[2] == 'MSR3D':# or sys.argv[2]=='CompAct':
     layer_set = [1]
 for num_words in [100]:
     for layer in layer_set:
