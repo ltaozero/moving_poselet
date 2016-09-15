@@ -20,7 +20,7 @@ data_gen_params = process_params(params)
 
 # change basedir to the folder where data are saved. 
 # It should have same format as the provided data in data folder
-basedir = 'data/'
+basedir = '~/work/Data/'
 filename = 'result.mat'
     
 # load body part config info, generate mask
@@ -39,7 +39,7 @@ if params['use_fb']:
 
 
 print("Loading Data...")
-data_generation = True
+data_generation = False
 X_train, y_train, X_test, y_test = load_data(basedir, dataset, data_gen_params['features'], params['subset'])
 
 nb_classes = len(np.unique(y_train))

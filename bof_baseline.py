@@ -9,6 +9,8 @@ from src.utils.sequence_3d import pad_sequences_3d, extract_feat, create_BP_mask
 from src.models.create_model import create_MP_model
 from src.utils.opt_parser import mp_parser, process_params
 from src.utils.data_generator import mp_data_generator
+from sklearn import svm
+from src.utils.bof_utils import compute_bof_hist
 #np.random.seed(1337)  # for reproducibility
 #sys.setrecursionlimit(50000)
 
@@ -43,10 +45,9 @@ MP_per_model = W_mask.shape[-1]
 if params['use_fb']:
     W_mask = None
     MP_per_model = params['num_MP']
-
+data_gen_params['padding'] = 0
 data_generation = True
-weights_all=[]
-hist_all = []
+label_all = []
 test_acc_all = []
 for sub in subset:
     print("Loading Data...")
@@ -56,33 +57,19 @@ for sub in subset:
     Y_train = np_utils.to_categorical(y_train, nb_classes)
     Y_test = np_utils.to_categorical(y_test, nb_classes)
 
-    # add parameters
-    decay_block = params['decay']*len(y_train)//params['batch_size']
-    params.update({'nb_classes':nb_classes, 'decay_block':decay_block,'maxlen': data_gen_params['maxlen'], 'MP_per_model':MP_per_model})
-    print(data_gen_params)
-    print(params)
 
-    print("Create Model...")
-    model = create_MP_model(params, input_dims, W_mask=W_mask)
-    #model = create_motif_model(params, input_dims, W_mask=W_mask)
+    X_BP_train, X_BP_test = preprocess_data(X_train, X_test, data_gen_params)         
+    # train a codebook
+    hist_train, hist_test = compute_bof_hist(X_BP_train[0], X_BP_test[0],params['num_MP'])
+    #hist_train = hist_train.astype('float64')/hist_train.sum(axis=1,keepdims=True)
+    #hist_test = hist_test.astype('float64')/hist_test.sum(axis=1,keepdims=True)
 
-    print("Train Model...")
-    if data_generation is False:
-        X_BP_train, X_BP_test = preprocess_data(X_train, X_test, data_gen_params)         
-        hist = model.fit(X_BP_train, Y_train, batch_size=params['batch_size'], nb_epoch=params['nb_epoch'], validation_data=(X_BP_test, Y_test), verbose=2)
-    else:
-        # TO BE ADDED
-        hist = model.fit_generator(mp_data_generator(X_train, Y_train, params['batch_size'],data_gen_params), samples_per_epoch =len(y_train), nb_epoch=params['nb_epoch'], validation_data=mp_data_generator(X_test, Y_test,params['batch_size'],data_gen_params), nb_val_samples= len(y_test),verbose=2)
+    # svm training
+    clf = svm.LinearSVC()
+    clf.fit(hist_train,y_train)
+    label = clf.predict(hist_test)
+    test_acc = (label==y_test).mean()
+    test_acc_all +=[test_acc]
+    label_all +=[label]
 
-        print("Test Model...")
-        metric = model.evaluate_generator(mp_data_generator(X_test, Y_test,params['batch_size'],data_gen_params),len(y_test))
-
-    test_acc = metric[1]
-    print("The accuracy on test data is: ", test_acc)
-    weights = model.get_weights()
-    weights_all += [weights]
-    hist_all += [hist.history]
-    test_acc_all += [test_acc]
-
-# save final data
-sio.savemat(filename,{'params':params, 'data_gen_params':data_gen_params,'weights_all':weights_all,'hist_all': hist_all,'test_acc_all':test_acc_all})
+sio.savemat(filename,{'test_acc_all':test_acc_all,'label_all':label_all})

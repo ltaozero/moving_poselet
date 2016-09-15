@@ -29,10 +29,10 @@ elif dataset =='CompAct':
 bp_set = {}
 fstr='nword{}_lr0.05_objhinge_opt0_decay50_l1{}_reg0.001_layer{}_rs0_multi2.mat'
 for action in range(len(action_set)):
-    fig, axes = plt.subplots(3,4,figsize=(40,20))
+    fig, axes = plt.subplots(1,2,figsize=(25,10))
 
-    for l1 in range(11):
-        ax = axes[l1//4][l1%4]
+    for idx,l1 in enumerate([0,10]):#range(11):
+        ax = axes[idx]
         fname=fstr.format(nword,0.1*l1,layer)
         if os.path.isfile(fname):
             a=sio.loadmat(fname)
@@ -47,14 +47,14 @@ for action in range(len(action_set)):
                 sorted_weights[num_MP*part:num_MP*(part+1)] = np.sort(abs(weights[num_MP*part:num_MP*(part+1)]))
             x = np.arange(len(weights))
             ax.vlines(x,[0],sorted_weights)
-            ax.set_title('alpha ={}'.format(0.1*l1))
+            ax.set_title('alpha ={}'.format(0.1*l1),fontsize=24)
 
             tickpos = np.arange(11)*num_MP
             ticklabel = ['','B','LL','RL','LB','LA','RA','UB','T','FUB','FB']
             ax.set_xticks(tickpos)
-            ax.set_xticklabels(ticklabel)
-    fig.suptitle('{}_nword{}'.format(action_set[action],nword))
-    fig.savefig('plots/{}_nword{}_{}.png'.format(dataset,nword, action_set[action]))        
+            ax.set_xticklabels(ticklabel,fontsize=24)
+    fig.suptitle('{}: MP_per_body_part={}'.format(action_set[action],nword),fontsize=24)
+    fig.savefig('plots/{}_sorted_weights_nword{}_layer{}_action_{}.png'.format(dataset,nword, layer,action_set[action]))        
 
 
 

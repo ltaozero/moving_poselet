@@ -7,7 +7,7 @@ class WeightRegularizerWithPmask(Regularizer):
     def __init__(self, l1=0., l2=0.,p_mask=None):
         self.l1 = K.cast_to_floatx(l1)
         self.l2 = K.cast_to_floatx(l2)
-        self.p_mask = K.cast_to_floatx(p_mask)
+        self.p_mask = p_mask
         self.uses_learning_phase = True
 
     def set_param(self, p):
@@ -26,7 +26,7 @@ class WeightRegularizerWithPmask(Regularizer):
         regularized_loss = loss
         p = self.p
         if self.p_mask is not None:
-            p = self.p * self.p_mask
+            p = self.p * K.cast_to_floatx(self.p_mask)
         if self.l1:
             regularized_loss += K.mean(K.abs(p)) * self.l1
         if self.l2:
