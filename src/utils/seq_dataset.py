@@ -3,7 +3,7 @@ import os
 import numpy as np
 from scipy import io as sio
 
-def load_data(basedir,dataset,features, sub=1, fold='subject'):
+def load_data(basedir,dataset,features, sub=1, setup_split='subject'):
 
     
     if features =='raw':
@@ -15,9 +15,9 @@ def load_data(basedir,dataset,features, sub=1, fold='subject'):
         raw_feature_file = os.path.expanduser("{}/{}/{}_{}.mat".format(basedir,dataset, dataset,features))
     contents = sio.loadmat(raw_feature_file)
     Y_all = contents["label"].ravel()
-    if setup == 'subject':
+    if setup_split == 'subject':
         partition = contents["subject"].ravel()
-    elif setup == 'supertrial':
+    elif setup_split == 'supertrial':
         partition = contents["trial"]
 
     if dataset == "MSR3D" or dataset == "MSRDaily":

@@ -20,11 +20,11 @@ data_gen_params = process_params(params)
 
 # change basedir to the folder where data are saved. 
 # It should have same format as the provided data in data folder
-basedir = '~/work/Data/'
+basedir = '/home-3/ltao4@jhu.edu/work/Data/'
     
 # load body part config info, generate mask
 dataset = params['dataset']
-filename = '{}_result_all2_{}.mat'.format(dataset, params['subset'])
+filename = '/home-3/ltao4@jhu.edu/scratch/mp_journal/{}/{}/nword{}_fb_fold{}.mat'.format(dataset, params['setup_split'], params['num_MP'], params['subset'])
 
 joint_map={'MSR3D':20,'MSRDaily':20,'CompAct':20,'MHAD':35,'HDM05':31,'CAD120':15,'Suturing':4, 'KnotTying':4, 'NeedlePassing':4}
 njoints = joint_map[dataset]

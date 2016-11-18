@@ -165,8 +165,14 @@ def preprocess_data(X_train,X_test,data_gen_params):
         X_BP_train = [extract_feat(X_train, full_BP,dataset,sample_rate,window_size = window_size,compute_vec=compute_vec) for sample_rate in sample_rate_set]
         X_BP_test = [extract_feat(X_test, full_BP,dataset,sample_rate,window_size = window_size,compute_vec=compute_vec) for sample_rate in sample_rate_set]
     else:
+        if dataset =='Suturing' or dataset == 'KnotTying' or dataset=='NeedlePassing':
+            # normalize data
+            X_std = np.vstack(X_train).std(0).T
+            X_train = [(x-x.mean(0))/X_std for x in X_train]
+            X_test = [(x-x.mean(0))/X_std for x in X_test]
         X_BP_train = [X_train]
         X_BP_test = [X_test]
+    
     if padding:
         X_BP_train = [pad_sequences_3d(X_BP_train[i], value = 1.0,maxlen = maxlen, dtype='float32', bias=0) for i in range(len(sample_rate_set))]
         X_BP_test = [pad_sequences_3d(X_BP_test[i], value = 1.0,maxlen = maxlen, dtype='float32', bias=0) for i in range(len(sample_rate_set))]
