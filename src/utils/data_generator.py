@@ -19,7 +19,10 @@ def mp_data_generator(X, y, batch_size,data_gen_params):
             batch_ids = index_array[batch_start:batch_end]
             y_batch = y[batch_ids]        
             X_batch = [X[i] for i in batch_ids]
-            X_BP_batch = [extract_feat(X_batch, full_BP,dataset,sample_rate,window_size = window_size,compute_vec=compute_vec) for sample_rate in sample_rate_set]
+            if features=='raw':
+                X_BP_batch = [extract_feat(X_batch, full_BP,dataset,sample_rate,window_size = window_size,compute_vec=compute_vec) for sample_rate in sample_rate_set]
+            else:
+                X_BP_batch = [X_batch]
             if padding:   
                 X_BP_batch = [pad_sequences_3d(X_BP_batch[i], value = 1.0, dtype='float32', bias=0) for i in range(len(sample_rate_set))]
         

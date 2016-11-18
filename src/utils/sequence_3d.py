@@ -54,6 +54,16 @@ def create_BP_mask(dataset, num_MP, feat_dim):
     Output: list of 2D array of size timesteps x output_dim, which only takes entry from part_index. For each frame t, [..., x(t-sampling_rate), x(t), x(t+sampling_rate),...], which contains window_size frames, is computed as output for frame t.
     '''
     
+    if dataset=='Suturing' or dataset=='KnotTying' or dataset=='NeedlePassing':
+        BP_info = [range(0,19),range(19,38), range(38,57),range(57,76), range(0,38),range(38,76),range(0,76)]
+        mask_all = []
+        for part_index in BP_info:
+            mask = np.zeros((76,num_MP),dtype='float32')
+            mask[part_index,:] = 1.0
+            mask_all.append(mask)
+        mask_all = np.concatenate(mask_all, axis=1)
+        return mask_all
+
     file_info = os.path.expanduser("~/work/Data/{}/{}_info.mat".format(dataset,dataset))    
     contents = sio.loadmat(file_info)
     BP_info = contents['config'][0]
@@ -64,6 +74,7 @@ def create_BP_mask(dataset, num_MP, feat_dim):
         dim_per_frame =93
     elif dataset =="CAD120":
         dim_per_frame=45
+
     n_frame = feat_dim/dim_per_frame
     mask_all = []
     for part_index in BP_info: 
@@ -95,6 +106,7 @@ def extract_feat(sequences, part_index,dataset,sampling_rate, window_size=5,comp
         dim_per_frame=93
     elif dataset=='CAD120':
         dim_per_frame=45
+
     part_index = np.int_(part_index)
     n_frame = sequences[0].shape[1]/dim_per_frame
     #print(n_frame)o
@@ -121,8 +133,7 @@ def extract_feat(sequences, part_index,dataset,sampling_rate, window_size=5,comp
             if dataset =='MSR3D':
                 vec_weight = 0.75
             vec[norm>0,:] = vec_weight*vec[norm>0,:] / norm1[norm>0,:]
-            if dataset =='MHAD' or dataset=='HDM05' or dataset=='CAD120':
-                tmp = tmp/np.sqrt(np.sum(tmp*tmp,axis=1,keepdims=True))
+            
         if compute_vec ==1:
             tmp = np.concatenate((tmp[1:,:],vec),axis=1)
         tmp1 = [np.array(tmp[j*sampling_rate:-(window_size-1-j)*sampling_rate or None, entry_index_all]) for j in range(window_size)]
@@ -150,8 +161,12 @@ def preprocess_data(X_train,X_test,data_gen_params):
     # for cross_entropy, use 0-1 label
     #y_train = np_utils.to_categorical(Y_train, nb_classes)
     #y_test = np_utils.to_categorical(Y_test, nb_classes)
-    X_BP_train = [extract_feat(X_train, full_BP,dataset,sample_rate,window_size = window_size,compute_vec=compute_vec) for sample_rate in sample_rate_set]
-    X_BP_test = [extract_feat(X_test, full_BP,dataset,sample_rate,window_size = window_size,compute_vec=compute_vec) for sample_rate in sample_rate_set]
+    if features == 'raw':
+        X_BP_train = [extract_feat(X_train, full_BP,dataset,sample_rate,window_size = window_size,compute_vec=compute_vec) for sample_rate in sample_rate_set]
+        X_BP_test = [extract_feat(X_test, full_BP,dataset,sample_rate,window_size = window_size,compute_vec=compute_vec) for sample_rate in sample_rate_set]
+    else:
+        X_BP_train = [X_train]
+        X_BP_test = [X_test]
     if padding:
         X_BP_train = [pad_sequences_3d(X_BP_train[i], value = 1.0,maxlen = maxlen, dtype='float32', bias=0) for i in range(len(sample_rate_set))]
         X_BP_test = [pad_sequences_3d(X_BP_test[i], value = 1.0,maxlen = maxlen, dtype='float32', bias=0) for i in range(len(sample_rate_set))]

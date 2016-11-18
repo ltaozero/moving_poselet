@@ -64,9 +64,14 @@ print("Create Model...")
 
 model = create_MP_model(params, input_dims, W_mask=W_mask)
 #model = create_motif_model(params, input_dims, W_mask=W_mask)
-
 print("Train Model...")
 if data_generation is False: 
+    # normalize data
+    X_std = np.vstack(X_train).std(0).T
+    X_train = [(x-x.mean(0))/X_std for x in X_train]
+    X_test = [(x-x.mean(0))/X_std for x in X_test]
+
+
     X_BP_train, X_BP_test = preprocess_data(X_train, X_test, data_gen_params)    
     hist = model.fit(X_BP_train, Y_train, batch_size=params['batch_size'], nb_epoch=params['nb_epoch'], validation_data=(X_BP_test, Y_test), verbose=2)
     metric = model.evaluate(X_BP_test,Y_test)
