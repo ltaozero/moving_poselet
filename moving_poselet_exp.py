@@ -32,7 +32,7 @@ njoints = joint_map[dataset]
 
 print("Loading Data...")
 data_generation = False
-X_train, y_train, X_test, y_test = load_data(basedir, dataset, data_gen_params['features'], params['subset'])
+X_train, y_train, X_test, y_test = load_data(basedir, dataset, data_gen_params['features'], sub=params['subset'], setup_plit=params['setup_plit'])
 nb_classes = len(np.unique(y_train))
 Y_train = np_utils.to_categorical(y_train, nb_classes)
 Y_test = np_utils.to_categorical(y_test, nb_classes)
