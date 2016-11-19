@@ -3,7 +3,7 @@ import sys
 
 for dataset in ['Suturing', 'KnotTying', 'NeedlePassing']:
 
-    for num_words in [300]:
+    for num_words in [150, 300]:
         for split in ['subject', 'supertrial']:
             for sub in subset:
                 layer = 1

@@ -26,8 +26,8 @@ elif dataset =='CompAct':
 
 # change basedir to the folder where data are saved. 
 # It should have same format as the provided data in data folder
-basedir = '~/work/Data/'
-filename = '/scratch/users/ltao4@jhu.edu/mp_journal/{}/{}/nword{}_lr{}_obj{}_opt{}_decay{}_l1{}_reg{}_layer{}_rs{}_multi{}.mat'.format(dataset,params['exp_name'],params['num_MP'],params['learning_rate'],'hinge', params['opt_method'],params['decay'],params['l1_alpha'],params['reg_weight'],params['tp_layer'],params['rs'],params['multi_ts'])
+basedir = os.path.expanduser('~/work/Data/')
+filename = os.path.expanduser('~/scratch/users/ltao4@jhu.edu/mp_journal/{}/{}/nword{}_lr{}_obj{}_opt{}_decay{}_l1{}_reg{}_layer{}_rs{}_multi{}.mat'.format(dataset,params['exp_name'],params['num_MP'],params['learning_rate'],'hinge', params['opt_method'],params['decay'],params['l1_alpha'],params['reg_weight'],params['tp_layer'],params['rs'],params['multi_ts']))
 
 if os.path.isfile(filename):
     sys.exit("file already exists!")

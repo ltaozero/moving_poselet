@@ -20,19 +20,19 @@ data_gen_params = process_params(params)
 
 # change basedir to the folder where data are saved. 
 # It should have same format as the provided data in data folder
-basedir = '/home-3/ltao4@jhu.edu/work/Data/'
+basedir = os.path.expanduser('~/work/Data/')
     
 # load body part config info, generate mask
 dataset = params['dataset']
-filename = '/home-3/ltao4@jhu.edu/scratch/mp_journal/{}/{}/nword{}_fb_fold{}.mat'.format(dataset, params['setup_split'], params['num_MP'], params['subset'])
+filename = os.path.expanduser('~/scratch/mp_journal/{}/{}/nword{}_fb_fold{}.mat'.format(dataset, params['setup_split'], params['num_MP'], params['subset']))
 
-joint_map={'MSR3D':20,'MSRDaily':20,'CompAct':20,'MHAD':35,'HDM05':31,'CAD120':15,'Suturing':4, 'KnotTying':4, 'NeedlePassing':4}
+joint_map={'MSR3D':20,'MSRDaily':20,'CompAct':20,'MHAD':35,'HDM05':31,'CAD120':15,'Suturing':4,'KnotTying':4, 'NeedlePassing':4}
 njoints = joint_map[dataset]
 
 
 print("Loading Data...")
 data_generation = False
-X_train, y_train, X_test, y_test = load_data(basedir, dataset, data_gen_params['features'], sub=params['subset'], setup_plit=params['setup_plit'])
+X_train, y_train, X_test, y_test = load_data(basedir, dataset, data_gen_params['features'], sub=params['subset'], setup_split=params['setup_split'])
 nb_classes = len(np.unique(y_train))
 Y_train = np_utils.to_categorical(y_train, nb_classes)
 Y_test = np_utils.to_categorical(y_test, nb_classes)

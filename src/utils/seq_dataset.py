@@ -19,6 +19,7 @@ def load_data(basedir,dataset,features, sub=1, setup_split='subject'):
         partition = contents["subject"].ravel()
     elif setup_split == 'supertrial':
         partition = contents["trial"]
+    partition = partition.ravel()
 
     if dataset == "MSR3D" or dataset == "MSRDaily":
         trainpartition = [1,3,5,7,9]
@@ -30,8 +31,8 @@ def load_data(basedir,dataset,features, sub=1, setup_split='subject'):
         testpartition = range(10,15)
     else:
         # all else are leaving one partition out cross validation
-        trainpartition = [ i in np.unique(partition) if i !=sub]
-        testpartitoin = [sub]
+        trainpartition = [ i for i in np.unique(partition) if i != sub]
+        testpartition = [sub]
 
 
     X_all1 = contents["features"].ravel()

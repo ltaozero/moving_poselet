@@ -21,7 +21,7 @@ def mp_parser():
     parser.add_argument('-f', action="store", dest='features', default = 'raw')
     parser.add_argument('--epoch', action="store", type=int, dest='nb_epoch', default = 300)
     parser.add_argument('--exp', action="store", dest='exp_name',default='results')
-    parser.add_argument('--split', action="store", dest='setup_split', defult = "subject")
+    parser.add_argument('--split', action="store", dest='setup_split', default = "subject")
     return parser
 
 def process_params(params):
